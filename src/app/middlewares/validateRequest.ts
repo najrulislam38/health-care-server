@@ -11,9 +11,6 @@ const validateRequest =
     // } catch (error) {
     //   next(error);
     // }
-    //   await schema.parseAsync({
-    //     body: req.body,
-    //   });
 
     try {
       if (req.body.data) {

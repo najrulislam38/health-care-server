@@ -17,6 +17,7 @@ const router = express.Router();
 //   }
 // );
 
+// creating patient
 router.post(
   "/create-patient",
   fileUploader.upload.single("file"),
@@ -24,11 +25,20 @@ router.post(
   UserController.createPatient
 );
 
+// creating doctor
 router.post(
   "/create-doctor",
   fileUploader.upload.single("file"),
   validateRequest(UserValidation.createDoctorValidationSchema),
   UserController.createDoctor
+);
+
+// creating admin
+router.post(
+  "/create-admin",
+  fileUploader.upload.single("file"),
+  validateRequest(UserValidation.createAdminValidationSchema),
+  UserController.createAdmin
 );
 
 export const userRouter = router;

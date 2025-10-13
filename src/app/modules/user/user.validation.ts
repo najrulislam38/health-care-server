@@ -1,5 +1,21 @@
 import z, { email } from "zod";
 
+const createAdminValidationSchema = z.object({
+  password: z.string(),
+  admin: z.object({
+    name: z.string({
+      error: "Name is required",
+    }),
+    email: z.email({
+      error: "Email is required",
+    }),
+    contactNumber: z.string({
+      error: "contactNumber is required",
+    }),
+    address: z.string().optional(),
+  }),
+});
+
 const createPatientValidationSchema = z.object({
   password: z.string(),
   patient: z.object({
@@ -41,4 +57,5 @@ const createDoctorValidationSchema = z.object({
 export const UserValidation = {
   createPatientValidationSchema,
   createDoctorValidationSchema,
+  createAdminValidationSchema,
 };
