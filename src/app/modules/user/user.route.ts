@@ -6,6 +6,8 @@ import validateRequest from "../../middlewares/validateRequest";
 
 const router = express.Router();
 
+router.get("/", UserController.getAllUser);
+
 // router.post(
 //   "/create-doctor",
 //   fileUploader.upload.single("file"),

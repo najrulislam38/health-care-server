@@ -1,7 +1,6 @@
 import { Request } from "express";
 import config from "../../../config";
 import { prisma } from "../../shared/prisma";
-import { createPatientInput } from "./user.interface";
 import bcrypt from "bcryptjs";
 import { fileUploader } from "../../helpers/FileUploader";
 import { UserRole } from "@prisma/client";
@@ -43,7 +42,7 @@ const createDoctorFromDB = async (req: Request) => {
     Number(config.round_salt)
   );
 
-  console.log("Result ", req.body.doctor.profilePhoto);
+  // console.log("Result ", req.body.doctor.profilePhoto);
 
   const result = await prisma.$transaction(async (tnx) => {
     await tnx.user.create({
@@ -73,7 +72,7 @@ const createAdminFromDB = async (req: Request) => {
     Number(config.round_salt)
   );
 
-  console.log("Result ", req.body.admin.profilePhoto);
+  // console.log("Result ", req.body.admin.profilePhoto);
 
   const result = await prisma.$transaction(async (tnx) => {
     await tnx.user.create({
@@ -92,8 +91,54 @@ const createAdminFromDB = async (req: Request) => {
   return result;
 };
 
+const getAllFromDB = async ({
+  page,
+  limit,
+  searchTerm,
+  sortBy,
+  sortOrder,
+  role,
+  status,
+}: {
+  page: number;
+  limit: number;
+  searchTerm?: any;
+  sortBy?: any;
+  sortOrder?: any;
+  role?: any;
+  status?: any;
+}) => {
+  const pageNumber = page || 1;
+  const limitNumber = limit || 10;
+
+  const skip = (pageNumber - 1) * limitNumber;
+
+  const result = await prisma.user.findMany({
+    skip,
+    take: limitNumber,
+    where: {
+      email: {
+        contains: searchTerm,
+        mode: "insensitive",
+      },
+      role: role,
+      status: status,
+    },
+    orderBy:
+      sortBy && sortOrder
+        ? {
+            [sortBy]: sortOrder,
+          }
+        : {
+            createdAt: "desc",
+          },
+  });
+  return result;
+};
+
 export const UserServices = {
   createPatientFromDB,
   createDoctorFromDB,
   createAdminFromDB,
+  getAllFromDB,
 };
