@@ -38,25 +38,19 @@ const createAdmin = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllUser = catchAsync(async (req: Request, res: Response) => {
+  const filters = pick(req.query, ["status", "role", "email", "searchTerm"]);
   const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"]);
 
-  const { page, limit, searchTerm, sortBy, sortOrder, role, status } =
-    req.query;
-  const result = await UserServices.getAllFromDB({
-    page: Number(page),
-    limit: Number(limit),
-    searchTerm,
-    sortBy,
-    sortOrder,
-    role,
-    status,
-  });
+  // const { page, limit, searchTerm, sortBy, sortOrder, role, status } =
+  //   req.query;
+  const result = await UserServices.getAllFromDB(filters, options);
 
   sendResponse(res, {
     statusCode: 201,
     success: true,
     message: "Users Retrieved Successfully",
-    data: result,
+    meta: result.meta,
+    data: result.data,
   });
 });
 
