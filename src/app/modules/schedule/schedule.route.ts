@@ -1,9 +1,15 @@
 import express from "express";
 import { ScheduleController } from "./schedule.controller";
+import auth from "../../middlewares/auth";
+import { UserRole } from "@prisma/client";
 
 const router = express.Router();
 
-router.get("/", ScheduleController.schedulesForDoctor);
+router.get(
+  "/",
+  auth(UserRole.ADMIN, UserRole.DOCTOR),
+  ScheduleController.schedulesForDoctor
+);
 
 router.post("/create", ScheduleController.createSchedule);
 

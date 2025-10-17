@@ -2,6 +2,7 @@ import { addMinutes, addHours, format } from "date-fns";
 import { prisma } from "../../shared/prisma";
 import { IOptions, paginationHelper } from "../../helpers/paginationHelper";
 import { Prisma } from "@prisma/client";
+import { IJwtUserPayload } from "../../types/common";
 
 const createScheduleFromDB = async (payload: any) => {
   const { startDate, endDate, startTime, endTime } = payload;
@@ -68,7 +69,11 @@ const createScheduleFromDB = async (payload: any) => {
   return schedules;
 };
 
-const schedulesForDoctorFromDB = async (filters: any, options: IOptions) => {
+const schedulesForDoctorFromDB = async (
+  user: IJwtUserPayload,
+  filters: any,
+  options: IOptions
+) => {
   const { page, limit, skip, sortBy, sortOrder } =
     paginationHelper.calculatePagination(options);
   const { startDateTime: filterStartDateTime, endDateTime: filterEndDateTime } =
@@ -100,28 +105,30 @@ const schedulesForDoctorFromDB = async (filters: any, options: IOptions) => {
         }
       : {};
 
-  // const doctorSchedules = await prisma.doctorSchedules.findMany({
-  //     where: {
-  //         doctor: {
-  //             email: user.email
-  //         }
-  //     },
-  //     select: {
-  //         scheduleId: true
-  //     }
-  // });
+  const doctorSchedules = await prisma.doctorSchedules.findMany({
+    where: {
+      doctor: {
+        email: user.email,
+      },
+    },
+    select: {
+      scheduleId: true,
+    },
+  });
+
+  const doctorScheduleIds = doctorSchedules.map(
+    (schedule) => schedule.scheduleId
+  );
 
   // const doctorScheduleIds = doctorSchedules.map(schedule => schedule.scheduleId);
 
   const result = await prisma.schedule.findMany({
-    where: whereConditions,
-
-    //  {
-    //   ...whereConditions,
-    //   // id: {
-    //   //     notIn: doctorScheduleIds
-    //   // }
-    // },
+    where: {
+      ...whereConditions,
+      id: {
+        notIn: doctorScheduleIds,
+      },
+    },
     skip,
     take: limit,
     orderBy: {
@@ -132,9 +139,9 @@ const schedulesForDoctorFromDB = async (filters: any, options: IOptions) => {
   const total = await prisma.schedule.count({
     where: {
       ...whereConditions,
-      // id: {
-      //     notIn: doctorScheduleIds
-      // }
+      id: {
+        notIn: doctorScheduleIds,
+      },
     },
   });
 
