@@ -21,6 +21,7 @@
     "express": "^5.1.0",
     "http-status": "^2.1.0",
     "multer": "^2.0.2",
+    "openai": "^6.4.0",
     "zod": "^4.1.12"
   },
   "devDependencies": {
