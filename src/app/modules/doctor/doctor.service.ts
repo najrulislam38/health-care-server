@@ -147,6 +147,7 @@ const updateIntoDB = async (
 };
 
 const getByIdFromDB = async (id: string): Promise<Doctor | null> => {
+  console.log(id);
   const result = await prisma.doctor.findUnique({
     where: {
       id,
@@ -165,6 +166,7 @@ const getByIdFromDB = async (id: string): Promise<Doctor | null> => {
       },
     },
   });
+  console.log(result);
   return result;
 };
 
