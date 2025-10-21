@@ -1,3 +1,4 @@
+import { stripe } from "../../helpers/stripe";
 import { prisma } from "../../shared/prisma";
 import { IJwtUserPayload } from "../../types/common";
 import { v4 as uuidv4 } from "uuid";
@@ -52,7 +53,7 @@ const createAppointmentFromDB = async (
 
     const transactionId = uuidv4();
 
-    await tnx.payment.create({
+    const paymentData = await tnx.payment.create({
       data: {
         appointmentId: appointmentData.id,
         amount: doctorData.appointmentFee,
@@ -60,7 +61,36 @@ const createAppointmentFromDB = async (
       },
     });
 
-    return appointmentData;
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      mode: "payment",
+      customer_email: patientData.email,
+      line_items: [
+        {
+          price_data: {
+            currency: "bdt",
+            product_data: {
+              name: `Appointment with Dr. ${doctorData.name}`,
+              // description: `Date: ${appointmentDate}`,
+            },
+            unit_amount: doctorData.appointmentFee * 100,
+          },
+          quantity: 1,
+        },
+      ],
+      metadata: {
+        appointmentId: appointmentData.id,
+        paymentId: paymentData.id,
+      },
+      // success_url: `${process.env.CLIENT_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `https://web.programming-hero.com/home`,
+      cancel_url: `${process.env.CLIENT_URL}/payment-cancelled`,
+      // metadata: { doctorId, appointmentDate },
+    });
+
+    console.log(session);
+
+    return { paymentUrl: session.url };
   });
 
   return result;
