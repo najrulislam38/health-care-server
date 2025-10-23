@@ -136,6 +136,7 @@ const getMyAppointmentFromDB = async (
     andConditions.length > 0 ? { AND: andConditions } : {};
 
   const result = await prisma.appointment.findMany({
+    where: whereConditions,
     skip,
     take: limit,
     orderBy: {
@@ -159,7 +160,54 @@ const getMyAppointmentFromDB = async (
   };
 };
 
+const getAllAppointmentFromDB = async (filters: any, options: IOptions) => {
+  const { page, limit, skip, sortBy, sortOrder } =
+    paginationHelper.calculatePagination(options);
+  const { ...filterData } = filters;
+
+  const andConditions: Prisma.AppointmentWhereInput[] = [];
+
+  if (Object.keys(filterData).length > 0) {
+    const filterConditions = Object.keys(filterData).map((key) => ({
+      [key]: {
+        equals: (filterData as any)[key],
+      },
+    }));
+    andConditions.push(...filterConditions);
+  }
+
+  const whereConditions: Prisma.AppointmentWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+
+  const result = await prisma.appointment.findMany({
+    where: whereConditions,
+    skip,
+    take: limit,
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+    include: {
+      doctor: true,
+      patient: true,
+    },
+  });
+
+  const total = await prisma.appointment.count({
+    where: whereConditions,
+  });
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
+};
+
 export const AppointmentService = {
   createAppointmentFromDB,
   getMyAppointmentFromDB,
+  getAllAppointmentFromDB,
 };
