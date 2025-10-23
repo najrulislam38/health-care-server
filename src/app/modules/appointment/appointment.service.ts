@@ -4,6 +4,8 @@ import { stripe } from "../../helpers/stripe";
 import { prisma } from "../../shared/prisma";
 import { IJwtUserPayload } from "../../types/common";
 import { v4 as uuidv4 } from "uuid";
+import ApiError from "../../errors/ApiError";
+import httpStatus from "http-status";
 
 const createAppointmentFromDB = async (
   user: IJwtUserPayload,
@@ -206,8 +208,44 @@ const getAllAppointmentFromDB = async (filters: any, options: IOptions) => {
   };
 };
 
+const updateAppointmentFormDB = async (
+  appointmentId: string,
+  status,
+  user: IJwtUserPayload
+) => {
+  const appointmentData = await prisma.appointment.findUniqueOrThrow({
+    where: {
+      id: appointmentId,
+    },
+    include: {
+      doctor: true,
+    },
+  });
+
+  if (user.role === UserRole.DOCTOR) {
+    if (!(user.email === appointmentData.doctor.email)) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        "This is not your appointment"
+      );
+    }
+  }
+
+  const result = await prisma.appointment.update({
+    where: {
+      id: appointmentId,
+    },
+    data: {
+      status,
+    },
+  });
+
+  return result;
+};
+
 export const AppointmentService = {
   createAppointmentFromDB,
   getMyAppointmentFromDB,
   getAllAppointmentFromDB,
+  updateAppointmentFormDB,
 };

@@ -63,8 +63,30 @@ const getAllAppointment = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateAppointment = catchAsync(
+  async (req: Request & { user?: IJwtUserPayload }, res: Response) => {
+    const appointmentId = req.params.id;
+    const { status } = req.body;
+    const user = req.user;
+
+    const result = await AppointmentService.updateAppointmentFormDB(
+      appointmentId,
+      status,
+      user as IJwtUserPayload
+    );
+
+    sendResponse(res, {
+      statusCode: 201,
+      success: true,
+      message: "Appointment updated successfully",
+      data: result,
+    });
+  }
+);
+
 export const AppointmentController = {
   createAppointment,
   getMyAppointment,
   getAllAppointment,
+  updateAppointment,
 };
