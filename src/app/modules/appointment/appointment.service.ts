@@ -1,4 +1,4 @@
-import { Prisma, UserRole } from "@prisma/client";
+import { AppointmentStatus, Prisma, UserRole } from "@prisma/client";
 import { IOptions, paginationHelper } from "../../helpers/paginationHelper";
 import { stripe } from "../../helpers/stripe";
 import { prisma } from "../../shared/prisma";
@@ -210,7 +210,7 @@ const getAllAppointmentFromDB = async (filters: any, options: IOptions) => {
 
 const updateAppointmentFormDB = async (
   appointmentId: string,
-  status,
+  status: AppointmentStatus,
   user: IJwtUserPayload
 ) => {
   const appointmentData = await prisma.appointment.findUniqueOrThrow({

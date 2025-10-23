@@ -4,7 +4,7 @@ import sendResponse from "../../shared/sendResponse";
 import { AppointmentService } from "./appointment.service";
 import { IJwtUserPayload } from "../../types/common";
 import { pick } from "../../helpers/pick";
-import { IOptions } from "../../helpers/paginationHelper";
+import httpStatus from "http-status";
 
 const createAppointment = catchAsync(
   async (req: Request & { user?: IJwtUserPayload }, res: Response) => {
@@ -36,7 +36,7 @@ const getMyAppointment = catchAsync(
     );
 
     sendResponse(res, {
-      statusCode: 201,
+      statusCode: httpStatus.OK,
       success: true,
       message: "Appointments Retrieved successfully",
       meta: result.meta,
@@ -55,7 +55,7 @@ const getAllAppointment = catchAsync(async (req: Request, res: Response) => {
   );
 
   sendResponse(res, {
-    statusCode: 201,
+    statusCode: httpStatus.OK,
     success: true,
     message: "Appointments Retrieved successfully",
     meta: result.meta,
@@ -76,7 +76,7 @@ const updateAppointment = catchAsync(
     );
 
     sendResponse(res, {
-      statusCode: 201,
+      statusCode: httpStatus.OK,
       success: true,
       message: "Appointment updated successfully",
       data: result,
