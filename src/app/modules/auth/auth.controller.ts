@@ -90,10 +90,23 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getMe = catchAsync(async (req: Request, res: Response) => {
+  const userSession = req.cookies;
+  const result = await AuthService.getMe(userSession);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User retrieved successfully.",
+    data: result,
+  });
+});
+
 export const AuthController = {
   login,
   refreshToken,
   changePassword,
   forgotPassword,
   resetPassword,
+  getMe,
 };
