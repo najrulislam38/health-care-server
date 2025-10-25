@@ -10,6 +10,12 @@ const router = express.Router();
 
 router.get("/", auth(UserRole.ADMIN), UserController.getAllUser);
 
+router.get(
+  "/me",
+  auth(...Object.values(UserRole)),
+  UserController.getMyProfile
+);
+
 // router.post(
 //   "/create-doctor",
 //   fileUploader.upload.single("file"),
