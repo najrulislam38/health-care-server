@@ -92,7 +92,7 @@ const createAppointmentFromDB = async (
       // metadata: { doctorId, appointmentDate },
     });
 
-    console.log(session);
+    // console.log(session);
 
     return { paymentUrl: session.url };
   });

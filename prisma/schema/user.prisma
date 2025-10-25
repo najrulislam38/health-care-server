@@ -43,15 +43,16 @@ model Doctor {
     qualification       String
     currentWorkingPlace String
     designation         String
+    averageRating       Float    @default(0.0)
     isDeleted           Boolean  @default(false)
     createdAt           DateTime @default(now())
     updatedAt           DateTime @updatedAt
 
     doctorSchedules   DoctorSchedules[]
     doctorSpecialties DoctorSpecialties[]
-
-    appointments  Appointment[]
-    prescriptions Prescription[]
+    appointments      Appointment[]
+    prescriptions     Prescription[]
+    reviews           Review[]
 
     user User @relation(fields: [email], references: [email])
 
@@ -68,8 +69,11 @@ model Patient {
     createdAt    DateTime @default(now())
     updatedAt    DateTime @updatedAt
 
-    appointments  Appointment[]
-    prescriptions Prescription[]
+    appointments      Appointment[]
+    prescriptions     Prescription[]
+    patientHealthData PatientHealthData?
+    medicalReport     MedicalReport[]
+    reviews           Review[]
 
     user User @relation(fields: [email], references: [email])
 
