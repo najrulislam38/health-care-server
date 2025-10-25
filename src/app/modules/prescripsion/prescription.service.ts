@@ -55,38 +55,66 @@ const getMyPrescriptionFormDB = async (
   const { page, limit, skip, sortBy, sortOrder } =
     paginationHelper.calculatePagination(options);
 
-  const andConditions: Prisma.PrescriptionWhereInput[] = [];
+  // way - 1
+  // const andConditions: Prisma.PrescriptionWhereInput[] = [];
 
-  if (user.role === UserRole.PATIENT) {
-    andConditions.push({
+  // if (user.role === UserRole.PATIENT) {
+  //   andConditions.push({
+  //     patient: {
+  //       email: user.email,
+  //     },
+  //   });
+  // } else if (user.role === UserRole.DOCTOR) {
+  //   andConditions.push({
+  //     doctor: {
+  //       email: user.email,
+  //     },
+  //   });
+  // }
+
+  // const whereConditions: Prisma.PrescriptionWhereInput =
+  //   andConditions.length > 0 ? { AND: andConditions } : {};
+
+  // const result = await prisma.prescription.findMany({
+  //   where: whereConditions,
+  //   skip,
+  //   take: limit,
+  //   orderBy: {
+  //     [sortBy]: sortOrder,
+  //   },
+  //   include:
+  //     user.role === UserRole.DOCTOR ? { patient: true } : { doctor: true },
+  // });
+
+  // const total = await prisma.prescription.count({
+  //   where: whereConditions,
+  // });
+
+  // way -2
+  const result = await prisma.prescription.findMany({
+    where: {
       patient: {
         email: user.email,
       },
-    });
-  } else if (user.role === UserRole.DOCTOR) {
-    andConditions.push({
-      doctor: {
-        email: user.email,
-      },
-    });
-  }
-
-  const whereConditions: Prisma.PrescriptionWhereInput =
-    andConditions.length > 0 ? { AND: andConditions } : {};
-
-  const result = await prisma.prescription.findMany({
-    where: whereConditions,
-    skip,
+    },
+    skip: skip,
     take: limit,
     orderBy: {
       [sortBy]: sortOrder,
     },
-    include:
-      user.role === UserRole.DOCTOR ? { patient: true } : { doctor: true },
+    include: {
+      doctor: true,
+      patient: true,
+      appointment: true,
+    },
   });
 
   const total = await prisma.prescription.count({
-    where: whereConditions,
+    where: {
+      patient: {
+        email: user.email,
+      },
+    },
   });
 
   return {
