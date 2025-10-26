@@ -53,4 +53,10 @@ router.post(
   UserController.createAdmin
 );
 
+router.patch(
+  "/:id/status",
+  auth(UserRole.ADMIN),
+  UserController.changeProfileStatus
+);
+
 export const userRouter = router;
