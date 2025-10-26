@@ -3,10 +3,11 @@ import config from "../../../config";
 import { prisma } from "../../shared/prisma";
 import bcrypt from "bcryptjs";
 import { fileUploader } from "../../helpers/FileUploader";
-import { Prisma, UserRole } from "@prisma/client";
+import { Prisma, UserRole, UserStatus } from "@prisma/client";
 
 import { userSearchableFields } from "./user.contants";
 import { paginationHelper } from "../../helpers/paginationHelper";
+import { IJwtUserPayload } from "../../types/common";
 
 const createPatientFromDB = async (req: Request) => {
   if (req.file) {
@@ -169,9 +170,74 @@ const getAllFromDB = async (params: any, options: any) => {
   };
 };
 
+const getMyProfileFromDB = async (user: IJwtUserPayload) => {
+  const userInfo = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: user.email,
+      status: UserStatus.ACTIVE,
+    },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      needPasswordChange: true,
+      status: true,
+    },
+  });
+
+  let profileData;
+
+  if (userInfo.role === UserRole.PATIENT) {
+    profileData = await prisma.patient.findUnique({
+      where: {
+        email: userInfo.email,
+      },
+    });
+  } else if (userInfo.role === UserRole.DOCTOR) {
+    profileData = await prisma.doctor.findUnique({
+      where: {
+        email: userInfo.email,
+      },
+    });
+  } else if (userInfo.role === UserRole.ADMIN) {
+    profileData = await prisma.admin.findUnique({
+      where: {
+        email: userInfo.email,
+      },
+    });
+  }
+
+  return {
+    ...userInfo,
+    ...profileData,
+  };
+};
+
+const changeProfileStatus = async (
+  id: string,
+  payload: { status: UserStatus }
+) => {
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: {
+      id,
+    },
+  });
+
+  const updateUserStatus = await prisma.user.update({
+    where: {
+      id,
+    },
+    data: payload,
+  });
+
+  return updateUserStatus;
+};
+
 export const UserServices = {
   createPatientFromDB,
   createDoctorFromDB,
   createAdminFromDB,
   getAllFromDB,
+  getMyProfileFromDB,
+  changeProfileStatus,
 };

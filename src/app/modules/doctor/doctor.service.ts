@@ -68,6 +68,11 @@ const getAllFromDB = async (filters: any, options: IOptions) => {
           specialties: true,
         },
       },
+      reviews: {
+        select: {
+          rating: true,
+        },
+      },
     },
   });
 
@@ -147,7 +152,6 @@ const updateIntoDB = async (
 };
 
 const getByIdFromDB = async (id: string): Promise<Doctor | null> => {
-  console.log(id);
   const result = await prisma.doctor.findUnique({
     where: {
       id,
@@ -164,9 +168,10 @@ const getByIdFromDB = async (id: string): Promise<Doctor | null> => {
           schedule: true,
         },
       },
+      reviews: true,
     },
   });
-  console.log(result);
+
   return result;
 };
 

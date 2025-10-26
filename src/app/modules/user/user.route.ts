@@ -10,6 +10,12 @@ const router = express.Router();
 
 router.get("/", auth(UserRole.ADMIN), UserController.getAllUser);
 
+router.get(
+  "/me",
+  auth(...Object.values(UserRole)),
+  UserController.getMyProfile
+);
+
 // router.post(
 //   "/create-doctor",
 //   fileUploader.upload.single("file"),
@@ -45,6 +51,12 @@ router.post(
   fileUploader.upload.single("file"),
   validateRequest(UserValidation.createAdminValidationSchema),
   UserController.createAdmin
+);
+
+router.patch(
+  "/:id/status",
+  auth(UserRole.ADMIN),
+  UserController.changeProfileStatus
 );
 
 export const userRouter = router;

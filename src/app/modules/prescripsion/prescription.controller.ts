@@ -23,6 +23,7 @@ const createPrescription = catchAsync(
     });
   }
 );
+
 const getMyPrescription = catchAsync(
   async (req: Request & { user?: IJwtUserPayload }, res: Response) => {
     const user = req.user;
@@ -37,7 +38,7 @@ const getMyPrescription = catchAsync(
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Prescriptions Retrieved successfully",
+      message: "Prescriptions fetched successfully",
       meta: result.meta,
       data: result.data,
     });

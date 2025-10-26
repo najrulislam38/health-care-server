@@ -3,6 +3,7 @@ import catchAsync from "../../shared/catchAsync";
 import { UserServices } from "./user.service";
 import sendResponse from "../../shared/sendResponse";
 import { pick } from "../../helpers/pick";
+import { IJwtUserPayload } from "../../types/common";
 
 const createPatient = catchAsync(async (req: Request, res: Response) => {
   const result = await UserServices.createPatientFromDB(req);
@@ -54,9 +55,41 @@ const getAllUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getMyProfile = catchAsync(
+  async (req: Request & { user?: IJwtUserPayload }, res: Response) => {
+    const user = req.user;
+
+    const result = await UserServices.getMyProfileFromDB(
+      user as IJwtUserPayload
+    );
+
+    sendResponse(res, {
+      statusCode: 201,
+      success: true,
+      message: "Users Retrieved Successfully",
+      data: result,
+    });
+  }
+);
+
+const changeProfileStatus = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const result = await UserServices.changeProfileStatus(id, req.body);
+
+  sendResponse(res, {
+    statusCode: 201,
+    success: true,
+    message: "User Profile status changed Successfully",
+    data: result,
+  });
+});
+
 export const UserController = {
   createPatient,
   createDoctor,
   createAdmin,
   getAllUser,
+  getMyProfile,
+  changeProfileStatus,
 };
