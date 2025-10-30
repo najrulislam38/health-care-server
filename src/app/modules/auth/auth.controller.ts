@@ -102,6 +102,26 @@ const getMe = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const logout = catchAsync(async (req: Request, res: Response) => {
+  res.clearCookie("accessToken", {
+    secure: true,
+    httpOnly: true,
+    sameSite: "none",
+  });
+  res.clearCookie("refreshToken", {
+    secure: true,
+    httpOnly: true,
+    sameSite: "none",
+  });
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Logged out successfully.",
+    data: null,
+  });
+});
+
 export const AuthController = {
   login,
   refreshToken,
@@ -109,4 +129,5 @@ export const AuthController = {
   forgotPassword,
   resetPassword,
   getMe,
+  logout,
 };
