@@ -152,7 +152,7 @@ const updateIntoDB = async (
 };
 
 const getByIdFromDB = async (id: string): Promise<Doctor | null> => {
-  const result = await prisma.doctor.findUnique({
+  const result = await prisma.doctor.findUniqueOrThrow({
     where: {
       id,
       isDeleted: false,
@@ -172,6 +172,7 @@ const getByIdFromDB = async (id: string): Promise<Doctor | null> => {
     },
   });
 
+  console.log(result);
   return result;
 };
 

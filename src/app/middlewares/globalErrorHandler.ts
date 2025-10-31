@@ -29,8 +29,7 @@ const globalErrorHandler = (
       statusCode = httpStatus.BAD_REQUEST;
     }
     if (err.code === "P2025") {
-      (message = "Maybe already booked. There was no data for query "),
-        (error = err.meta);
+      (message = "There was no data for query"), (error = err.meta);
       statusCode = httpStatus.BAD_REQUEST;
     }
   } else if (err instanceof Prisma.PrismaClientValidationError) {
