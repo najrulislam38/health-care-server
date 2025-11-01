@@ -4,6 +4,7 @@ import { UserServices } from "./user.service";
 import sendResponse from "../../shared/sendResponse";
 import { pick } from "../../helpers/pick";
 import { IJwtUserPayload } from "../../types/common";
+import httpStatus from "http-status";
 
 const createPatient = catchAsync(async (req: Request, res: Response) => {
   const result = await UserServices.createPatientFromDB(req);
@@ -85,6 +86,24 @@ const changeProfileStatus = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateMyProfile = catchAsync(
+  async (req: Request & { user?: IJwtUserPayload }, res: Response) => {
+    const user = req.user;
+
+    const result = await UserServices.updateMyProfile(
+      user as IJwtUserPayload,
+      req
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "My profile updated!",
+      data: result,
+    });
+  }
+);
+
 export const UserController = {
   createPatient,
   createDoctor,
@@ -92,4 +111,5 @@ export const UserController = {
   getAllUser,
   getMyProfile,
   changeProfileStatus,
+  updateMyProfile,
 };

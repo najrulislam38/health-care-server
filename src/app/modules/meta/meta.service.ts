@@ -181,13 +181,13 @@ const getPieChartData = async () => {
     _count: { id: true },
   });
 
-  const formatedAppointmentStatusDistribution =
+  const formattedAppointmentStatusDistribution =
     appointmentStatusDistribution.map(({ status, _count }) => ({
       status,
       count: Number(_count.id),
     }));
 
-  return formatedAppointmentStatusDistribution;
+  return formattedAppointmentStatusDistribution;
 };
 
 export const MetaService = {

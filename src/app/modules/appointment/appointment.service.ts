@@ -170,9 +170,23 @@ const getMyAppointmentFromDB = async (
 const getAllAppointmentFromDB = async (filters: any, options: IOptions) => {
   const { page, limit, skip, sortBy, sortOrder } =
     paginationHelper.calculatePagination(options);
-  const { ...filterData } = filters;
+  const { patientEmail, doctorEmail, ...filterData } = filters;
 
   const andConditions: Prisma.AppointmentWhereInput[] = [];
+
+  if (patientEmail) {
+    andConditions.push({
+      patient: {
+        email: patientEmail,
+      },
+    });
+  } else if (doctorEmail) {
+    andConditions.push({
+      doctor: {
+        email: doctorEmail,
+      },
+    });
+  }
 
   if (Object.keys(filterData).length > 0) {
     const filterConditions = Object.keys(filterData).map((key) => ({
@@ -183,6 +197,19 @@ const getAllAppointmentFromDB = async (filters: any, options: IOptions) => {
     andConditions.push(...filterConditions);
   }
 
+  // 2nd way
+  // if (Object.keys(filterData).length > 0) {
+  //     andConditions.push({
+  //         AND: Object.keys(filterData).map((key) => {
+  //             return {
+  //                 [key]: {
+  //                     equals: (filterData as any)[key]
+  //                 }
+  //             };
+  //         })
+  //     });
+  // }
+
   const whereConditions: Prisma.AppointmentWhereInput =
     andConditions.length > 0 ? { AND: andConditions } : {};
 
@@ -190,9 +217,12 @@ const getAllAppointmentFromDB = async (filters: any, options: IOptions) => {
     where: whereConditions,
     skip,
     take: limit,
-    orderBy: {
-      [sortBy]: sortOrder,
-    },
+    orderBy:
+      sortBy && sortOrder
+        ? {
+            [sortBy]: sortOrder,
+          }
+        : { createdAt: "desc" },
     include: {
       doctor: true,
       patient: true,

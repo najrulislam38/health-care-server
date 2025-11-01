@@ -5,6 +5,7 @@ import { AppointmentService } from "./appointment.service";
 import { IJwtUserPayload } from "../../types/common";
 import { pick } from "../../helpers/pick";
 import httpStatus from "http-status";
+import { appointmentFilterableFields } from "./appointment.constant";
 
 const createAppointment = catchAsync(
   async (req: Request & { user?: IJwtUserPayload }, res: Response) => {
@@ -47,7 +48,7 @@ const getMyAppointment = catchAsync(
 
 const getAllAppointment = catchAsync(async (req: Request, res: Response) => {
   const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"]);
-  const filters = pick(req.query, ["status", "paymentStatus"]);
+  const filters = pick(req.query, appointmentFilterableFields);
 
   const result = await AppointmentService.getAllAppointmentFromDB(
     filters,
